@@ -1,0 +1,24 @@
+stages:
+ - build
+
+cache:
+  paths:
+    - node_modules/
+
+deploy:
+  stage: build
+  image: node:14
+  only:
+    - master
+  before_script:
+    - apt-get update -y
+  script:
+    - apk add openssh
+    - mkdir -p ~/.ssh
+    - ssh-keyscan -H "$DEPLOY_HOSTNAME"  >> ~/.ssh/known_hosts
+    - echo "$DEPLOY_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - npm install
+    - npm run build
+    - ssh ubuntu@$DEPLOY_HOSTNAME "mkdir -p /var/www/html/react_gitlab_ci"
+    - scp -r build/* ubuntu@$DEPLOY_HOSTNAME:/var/www/html/react_gitlab_ci/public
