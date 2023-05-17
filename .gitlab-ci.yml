@@ -22,4 +22,4 @@ deploy:
     - npm install
     - npm run build
     - ssh ubuntu@$DEPLOY_HOSTNAME "mkdir -p /var/www/html/react_gitlab_ci"
-    - scp -r build/* ubuntu@$DEPLOY_HOSTNAME:/var/www/html/react_gitlab_ci/public
+    - scp -r build/* ubuntu@$DEPLOY_HOSTNAME:/var/www/html/react_gitlab_ci
