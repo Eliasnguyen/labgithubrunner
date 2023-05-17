@@ -13,7 +13,7 @@ deploy:
   before_script:
     - apt-get update -y
   script:
-    - apk add openssh
+    - apt-get install openssh
     - mkdir -p ~/.ssh
     - ssh-keyscan -H "$DEPLOY_HOSTNAME"  >> ~/.ssh/known_hosts
     - echo "$DEPLOY_KEY" > ~/.ssh/id_rsa
