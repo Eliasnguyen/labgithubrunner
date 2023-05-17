@@ -12,8 +12,9 @@ deploy:
     - master
   before_script:
     - apt-get update -y
+    - apt-get -y install rsync
   script:
-    - apt-get install openssh
+    - apk add rsync && apk add openssh
     - mkdir -p ~/.ssh
     - ssh-keyscan -H "$DEPLOY_HOSTNAME"  >> ~/.ssh/known_hosts
     - echo "$DEPLOY_KEY" > ~/.ssh/id_rsa
