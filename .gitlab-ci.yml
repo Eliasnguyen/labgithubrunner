@@ -29,7 +29,7 @@ deploy:
     - ssh-keyscan -H "52.220.39.194"  >> ~/.ssh/known_hosts
     - echo "$DEPLOY_KEY" > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
-    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+    - ssh ubuntu@52.220.39.194 "docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}"
     - ssh ubuntu@52.220.39.194 "docker pull $CI_REGISTRY_IMAGE"
     - ssh ubuntu@52.220.39.194 "docker stop $(docker ps -aq)"
     - ssh ubuntu@52.220.39.194 "docker rm $(docker ps -aq)"
