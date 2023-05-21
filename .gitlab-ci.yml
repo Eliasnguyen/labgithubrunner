@@ -1,3 +1,7 @@
+image: docker:19
+services:
+  - docker:dind
+
 stages:
  - build
  - deploy
@@ -6,14 +10,14 @@ cache:
   paths:
     - node_modules/
 
-build
+build:
   only:
     - master
   stage: build
   script:
-    - docker build -t cicd:latest .
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker push cicd:latest
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+    - docker build -t $CI_REGISTRY_IMAGE .
+    - docker push $CI_REGISTRY_IMAGE
 
 
 deploy:
@@ -25,7 +29,7 @@ deploy:
     - ssh-keyscan -H "$DEPLOY_HOSTNAME"  >> ~/.ssh/known_hosts
     - echo "$DEPLOY_KEY" > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
-    - ssh ubuntu@52.220.39.194 "docker pull cicd:latest"
+    - ssh ubuntu@52.220.39.194 "docker pull $CI_REGISTRY_IMAGE"
     - ssh ubuntu@52.220.39.194 "docker stop $(docker ps -aq)"
     - ssh ubuntu@52.220.39.194 "docker rm $(docker ps -aq)"
-    - ssh ubuntu@52.220.39.194 "docker run -d --name cicd -p 80:80 cicd:latest"
+    - ssh ubuntu@52.220.39.194 "docker run -d --name cicd -p 80:80 $CI_REGISTRY_IMAGE"
