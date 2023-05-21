@@ -30,7 +30,8 @@ deploy:
     - echo "$DEPLOY_KEY" > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
     - ssh ubuntu@52.220.39.194 "docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}"
+    - ssh ubuntu@52.220.39.194 "if [ -n "$(docker ps -q)" ]; then docker stop $(docker ps -q); fi"
+    - ssh ubuntu@52.220.39.194 "if [ -n "$(docker ps -q)" ]; then docker rm $(docker ps -q); fi"
+    - ssh ubuntu@52.220.39.194 "if [ -n "$(docker images -q)" ]; then docker rmi $(docker iamges -q); fi"
     - ssh ubuntu@52.220.39.194 "docker pull $CI_REGISTRY_IMAGE"
-    - ssh ubuntu@52.220.39.194 "docker stop $(docker ps -aq)"
-    - ssh ubuntu@52.220.39.194 "docker rm $(docker ps -aq)"
-    - ssh ubuntu@52.220.39.194 "docker run -d --name cicd -p 80:80 $CI_REGISTRY_IMAGE"
+    - ssh ubuntu@52.220.39.194 "docker run -d --name cicd -p 3000:3000 $CI_REGISTRY_IMAGE"
