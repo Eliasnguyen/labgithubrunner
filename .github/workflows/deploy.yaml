@@ -49,7 +49,7 @@ jobs:
       - name: Verify
         run: echo ${{ steps.docker_build.outputs.digest }}
    
-jobs:
+
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
