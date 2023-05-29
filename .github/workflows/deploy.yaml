@@ -69,7 +69,6 @@ jobs:
         ssh-keyscan -H ${{ secrets.SSH_ADDRESS }}  >> ~/.ssh/known_hosts
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        ssh ubuntu@${{ secrets.SSH_ADDRESS }} "docker "
         ssh ubuntu@${{ secrets.SSH_ADDRESS }} 'if [ -n "$(docker ps -aq)" ]; then docker stop $(docker ps -aq); fi'
         ssh ubuntu@${{ secrets.SSH_ADDRESS }} 'if [ -n "$(docker ps -aq)" ]; then docker rm $(docker ps -aq); fi'
         ssh ubuntu@${{ secrets.SSH_ADDRESS }} 'if [ -n "$(docker images -q ${{ secrets.DOCKERHUB_USERNAME }}/khanhnt-githubaction" ]; then docker rmi $(docker images -q ${{ secrets.DOCKERHUB_USERNAME }}/khanhnt-githubaction); fi'
