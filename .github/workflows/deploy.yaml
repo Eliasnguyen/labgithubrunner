@@ -71,6 +71,6 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
         ssh ubuntu@${{ secrets.SSH_ADDRESS }} 'if [ -n "$(docker ps -aq)" ]; then docker stop $(docker ps -aq); fi'
         ssh ubuntu@${{ secrets.SSH_ADDRESS }} 'if [ -n "$(docker ps -aq)" ]; then docker rm $(docker ps -aq); fi'
-        ssh ubuntu@${{ secrets.SSH_ADDRESS }} 'if [ -n "$(docker images -q ${{ secrets.DOCKERHUB_USERNAME }}/khanhnt-githubaction" ]; then docker rmi $(docker images -q ${{ secrets.DOCKERHUB_USERNAME }}/khanhnt-githubaction); fi'
+        ssh ubuntu@${{ secrets.SSH_ADDRESS }} 'if [ -n "$(docker images -q ${{ secrets.DOCKERHUB_USERNAME }}/khanhnt-githubaction)" ]; then docker rmi $(docker images -q ${{ secrets.DOCKERHUB_USERNAME }}/khanhnt-githubaction); fi'
         ssh ubuntu@${{ secrets.SSH_ADDRESS }} "docker pull ${{ secrets.DOCKERHUB_USERNAME }}/khanhnt-githubaction"
         ssh ubuntu@${{ secrets.SSH_ADDRESS }} "docker run -d --name cicd -p 3000:3000 ${{ secrets.DOCKERHUB_USERNAME }}/khanhnt-githubaction"
