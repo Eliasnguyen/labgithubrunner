@@ -4,6 +4,11 @@ on:
     branches:
       - master
 
+env:
+  SSH_ADDRESS: ${{ secrets.SSH_ADDRESS }}
+  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -44,3 +49,29 @@ jobs:
       - name: Verify
         run: echo ${{ steps.docker_build.outputs.digest }}
    
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Login Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+
+    - name: Build, deploy to server
+      id: build-deploy
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ secrets.SSH_ADDRESS }}  >> ~/.ssh/known_hosts
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh ubuntu@${{ secrets.SSH_ADDRESS }} "docker "
+        ssh ubuntu@${{ secrets.SSH_ADDRESS }} 'if [ -n "$(docker ps -aq)" ]; then docker stop $(docker ps -aq); fi'
+        ssh ubuntu@${{ secrets.SSH_ADDRESS }} 'if [ -n "$(docker ps -aq)" ]; then docker rm $(docker ps -aq); fi'
+        ssh ubuntu@${{ secrets.SSH_ADDRESS }} 'if [ -n "$(docker images -q ${{ secrets.DOCKERHUB_USERNAME }}/khanhnt-githubaction" ]; then docker rmi $(docker images -q ${{ secrets.DOCKERHUB_USERNAME }}/khanhnt-githubaction); fi'
+        ssh ubuntu@${{ secrets.SSH_ADDRESS }} "docker pull ${{ secrets.DOCKERHUB_USERNAME }}/khanhnt-githubaction"
+        ssh ubuntu@${{ secrets.SSH_ADDRESS }} "docker run -d --name cicd -p 3000:3000 ${{ secrets.DOCKERHUB_USERNAME }}/khanhnt-githubaction"
